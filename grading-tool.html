@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Varanashi Photo Grader</title>
+  <style>
+    :root {
+      --limewash: #F9E6D6;
+      --limewash-l2: #FBF2E9;
+      --mist: #C7D5DE;
+      --mist-light: #E1E9EF;
+      --sunbreak: #E47444;
+      --sunbreak-deep: #AC492B;
+      --slate: #2C3D52;
+      --gold: #F6C463;
+    }
+
+    @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz@9..144&display=swap');
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      background: var(--limewash-l2);
+      color: var(--slate);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Georgia, serif;
+      font-size: 16px;
+      line-height: 1.5;
+      padding: 40px 20px;
+    }
+
+    .container {
+      max-width: 100%;
+      margin: 0 auto;
+    }
+
+    h1 {
+      font-family: 'Fraunces', Georgia, serif;
+      font-size: 32px;
+      font-weight: 600;
+      margin: 0 0 12px;
+      color: var(--slate);
+      letter-spacing: -0.01em;
+    }
+
+    .intro {
+      max-width: 100%;
+      color: #445C75;
+      font-size: 15px;
+      margin-bottom: 32px;
+      line-height: 1.6;
+    }
+
+    .uploader {
+      background: transparent;
+      border: 1px dashed rgba(44,61,82,.28);
+      border-radius: 6px;
+      padding: 32px;
+      margin-bottom: 40px;
+      text-align: center;
+      transition: background .2s ease;
+    }
+
+    .uploader:hover {
+      background: var(--limewash);
+    }
+
+    .uploader.drag-over {
+      background: var(--mist-light);
+      border-color: var(--slate);
+      border-style: solid;
+    }
+
+    .upload-area {
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .upload-label {
+      display: block;
+      font-size: 16px;
+      color: var(--slate);
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+
+    .upload-hint {
+      font-size: 14px;
+      color: var(--slate);
+      margin-bottom: 20px;
+    }
+
+    input[type="file"] {
+      display: none;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 20px 8px;
+      border: none;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .btn-primary {
+      background: var(--slate);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #1D2A3A;
+    }
+
+    .btn-secondary {
+      background: var(--mist-light);
+      color: var(--slate);
+      border: 1px solid var(--mist);
+    }
+
+    .btn-secondary:hover {
+      background: var(--mist);
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .compare {
+      position: relative;
+      margin-top: 40px;
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      background: var(--mist-light);
+      border: 1px solid var(--mist);
+      border-radius: 6px;
+      overflow: hidden;
+      user-select: none;
+      touch-action: none;
+      cursor: ew-resize;
+    }
+
+    .compare img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      pointer-events: none;
+    }
+
+    .compare-after {
+      /* clipped to the handle position via inline clip-path, set in JS */
+    }
+
+    .compare-tag {
+      position: absolute;
+      top: 14px;
+      padding: 6px 12px 3px;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-weight: 500;
+      color: white;
+      background: rgba(44,61,82,.72);
+      border-radius: 999px;
+      pointer-events: none;
+    }
+
+    .compare-tag.before { left: 14px; }
+    .compare-tag.after { right: 14px; }
+
+    .compare-handle {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 0;
+      left: 50%;
+      cursor: ew-resize;
+    }
+
+    .compare-handle::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: -1px;
+      width: 2px;
+      background: white;
+      box-shadow: 0 0 0 1px rgba(44,61,82,.35);
+    }
+
+    .compare-handle::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: white;
+      box-shadow: 0 2px 8px rgba(44,61,82,.35), 0 0 0 1px rgba(44,61,82,.2);
+    }
+
+    .compare-handle-arrows {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      pointer-events: none;
+      color: var(--slate);
+    }
+
+    .status {
+      padding: 16px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+      font-size: 14px;
+      display: none;
+    }
+
+    .status.show { display: block; }
+    .status.info { background: #E3F2FD; color: #1565C0; }
+    .status.success { background: #E3EEDF; color: #2F6B3A; }
+    .status.error { background: #F5DDD6; color: #9B2C1F; }
+
+    .controls {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 20px;
+    }
+
+    .grade-details {
+      background: var(--limewash);
+      border-left: 4px solid var(--sunbreak);
+      padding: 16px;
+      border-radius: 4px;
+      margin-top: 20px;
+      font-size: 14px;
+      line-height: 1.6;
+      max-width: 58ch;
+    }
+
+    .grade-details h3 {
+      margin: 0 0 10px;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--sunbreak-deep);
+    }
+
+    .grade-details p {
+      margin: 0 0 8px;
+    }
+
+    .grade-details p:last-child {
+      margin-bottom: 0;
+    }
+
+    .loading {
+      display: inline-block;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="uploader" id="uploader">
+      <div class="upload-area" id="uploadArea">
+        <label class="upload-label">Choose a photo or drag it here</label>
+        <p class="upload-hint">JPEG or PNG, up to 5MB</p>
+        <button class="btn btn-primary" onclick="document.getElementById('fileInput').click()">
+          Select File
+        </button>
+        <input type="file" id="fileInput" accept="image/jpeg,image/png" />
+      </div>
+    </div>
+
+    <div id="previewContainer" style="display: none;">
+      <div class="status info show" id="processingStatus">
+        <span class="loading">⟳</span> Grading your photo...
+      </div>
+
+      <div class="compare" id="compare">
+        <img id="originalPreview" alt="Original photo" />
+        <img id="gradedPreview" class="compare-after" alt="Graded photo" />
+        <span class="compare-tag before">Original</span>
+        <span class="compare-tag after">Graded</span>
+        <div class="compare-handle" id="compareHandle">
+          <span class="compare-handle-arrows">
+            <svg width="9" height="9" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="10 3 5 8 10 13"/></svg>
+            <svg width="9" height="9" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 3 11 8 6 13"/></svg>
+          </span>
+        </div>
+      </div>
+
+      <div class="controls">
+        <button class="btn btn-primary" id="downloadBtn" onclick="downloadGraded()">
+          Download Graded Image
+        </button>
+        <button class="btn btn-secondary" id="resetBtn" onclick="resetUpload()">
+          Grade Another Photo
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // OKLab colour space math (from the Python implementation)
+    class OKLab {
+      static rgb2lin(c) {
+        return c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+      }
+
+      static lin2rgb(c) {
+        return c <= 0.0031308 ? 12.92 * c : 1.055 * Math.pow(Math.max(0, c), 1 / 2.4) - 0.055;
+      }
+
+      static rgb2lch(r, g, b) {
+        r = this.rgb2lin(r);
+        g = this.rgb2lin(g);
+        b = this.rgb2lin(b);
+
+        const l = Math.cbrt(0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b);
+        const m = Math.cbrt(0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b);
+        const s = Math.cbrt(0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b);
+
+        const L = 0.2104542553 * l + 0.7936177850 * m - 0.0040720468 * s;
+        const a = 1.9779984951 * l - 2.4285922050 * m + 0.4505937099 * s;
+        const b_ = 0.0259040371 * l + 0.7827717662 * m - 0.8086757660 * s;
+
+        const C = Math.hypot(a, b_);
+        const H = (Math.atan2(b_, a) * 180 / Math.PI + 360) % 360;
+
+        return { L, C, H };
+      }
+
+      static lch2rgb(L, C, H) {
+        const hRad = H * Math.PI / 180;
+        const a = C * Math.cos(hRad);
+        const b_ = C * Math.sin(hRad);
+
+        const l = Math.pow(L + 0.3963377774 * a + 0.2158037573 * b_, 3);
+        const m = Math.pow(L - 0.1055613458 * a - 0.0638541728 * b_, 3);
+        const s = Math.pow(L - 0.0894841775 * a - 1.2914855480 * b_, 3);
+
+        const r = 4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s;
+        const g = -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s;
+        const bl = -0.0041960863 * l - 0.7034186147 * m + 1.7076147010 * s;
+
+        return [this.lin2rgb(r), this.lin2rgb(g), this.lin2rgb(bl)];
+      }
+    }
+
+    class FutureArchivesGrader {
+      constructor(warmth = 1.0, dramatic = 1.0, tension = 1.0) {
+        this.seed = 4;
+        this.warmth = warmth;      // Controls highlight warmth (gold factor)
+        this.dramatic = dramatic;  // Controls tonal curve drama (toe/shoulder intensity)
+        this.tension = tension;    // Controls cool-green vs warm-earth balance
+      }
+
+      interpolate(xs, ys, x) {
+        // Simple PCHIP interpolation
+        if (x <= xs[0]) return ys[0];
+        if (x >= xs[xs.length - 1]) return ys[ys.length - 1];
+
+        for (let i = 0; i < xs.length - 1; i++) {
+          if (x >= xs[i] && x <= xs[i + 1]) {
+            const t = (x - xs[i]) / (xs[i + 1] - xs[i]);
+            return ys[i] * (1 - t) + ys[i + 1] * t;
+          }
+        }
+        return ys[ys.length - 1];
+      }
+
+      hd(a, b) {
+        return ((b - a + 180) % 360) - 180;
+      }
+
+      pull(H, C, center, width, target, amt) {
+        const w = Math.exp(-0.5 * Math.pow(this.hd(H, center) / width, 2)) * Math.min(1, C / 0.04);
+        return (H + this.hd(H, target) * w * amt + 360) % 360;
+      }
+
+      grain(L, seed = 4) {
+        // Simplified grain: use a pseudo-random based on position for consistency
+        const x = Math.sin(L * 12.9898 + seed) * 43758.5453;
+        const noise = x - Math.floor(x);
+        return noise * 0.02 - 0.01;
+      }
+
+      autoBalance(imageData) {
+        // Auto-balance exposure and color cast before grading
+        // Analyzes the histogram and applies a corrective curve
+        const data = imageData.data;
+        const len = data.length;
+
+        // Collect histogram data
+        const lHist = new Array(256).fill(0);
+        for (let i = 0; i < len; i += 4) {
+          const r = data[i];
+          const g = data[i + 1];
+          const b = data[i + 2];
+          const l = Math.round((r * 0.299 + g * 0.587 + b * 0.114));
+          lHist[l]++;
+        }
+
+        // Find clipping points (2nd and 98th percentile)
+        let lBlack = 0, lWhite = 255;
+        const totalPixels = len / 4;
+        let count = 0;
+        for (let i = 0; i < 256; i++) {
+          count += lHist[i];
+          if (count >= totalPixels * 0.02 && lBlack === 0) lBlack = i;
+          if (count >= totalPixels * 0.98) { lWhite = i; break; }
+        }
+
+        // Prevent extreme stretching
+        if (lWhite - lBlack < 50) {
+          lBlack = Math.max(0, lBlack - 10);
+          lWhite = Math.min(255, lWhite + 10);
+        }
+
+        // Apply levels correction
+        const balancedData = new ImageData(imageData.width, imageData.height);
+        const outData = balancedData.data;
+
+        for (let i = 0; i < len; i += 4) {
+          let r = data[i];
+          let g = data[i + 1];
+          let b = data[i + 2];
+
+          // Stretch the histogram
+          const scale = 255 / (lWhite - lBlack);
+          r = Math.max(0, Math.min(255, (r - lBlack) * scale));
+          g = Math.max(0, Math.min(255, (g - lBlack) * scale));
+          b = Math.max(0, Math.min(255, (b - lBlack) * scale));
+
+          // Slight color correction: reduce the strongest channel by 3%
+          const max = Math.max(r, g, b);
+          if (max > 150) {
+            if (r === max) r *= 0.97;
+            else if (g === max) g *= 0.97;
+            else if (b === max) b *= 0.97;
+          }
+
+          outData[i] = Math.round(r);
+          outData[i + 1] = Math.round(g);
+          outData[i + 2] = Math.round(b);
+          outData[i + 3] = data[i + 3];
+        }
+
+        return balancedData;
+      }
+
+      grade(imageData) {
+        const data = imageData.data;
+        const len = data.length;
+
+        // Adjust filmic curve based on dramatic parameter
+        const toeAdjusted = 0.075 + (this.dramatic - 1.0) * 0.015;  // 0.06 to 0.09
+        const shoulderAdjusted = 0.955 - (this.dramatic - 1.0) * 0.045; // 0.91 to 1.0
+
+        // Adjust hue pull amounts based on tension
+        const greenPull = 0.45 * (0.7 + 0.3 * this.tension);  // Cooler (green) more when tension > 1
+        const orangePull = 0.5 * (1.3 - 0.3 * this.tension);  // Warmer (orange) more when tension < 1
+
+        for (let i = 0; i < len; i += 4) {
+          let r = data[i] / 255;
+          let g = data[i + 1] / 255;
+          let b = data[i + 2] / 255;
+
+          // RGB to OKLab
+          let { L, C, H } = OKLab.rgb2lch(r, g, b);
+
+          // Filmic curve (adjusted by dramatic)
+          let L_curve = this.interpolate(
+            [0, 0.15, 0.5, 0.85, 1],
+            [toeAdjusted, 0.17, 0.50, 0.84, shoulderAdjusted],
+            Math.min(1, Math.max(0, L))
+          );
+
+          // Pull greens and oranges (adjusted by tension)
+          H = this.pull(H, C, 135, 32, 150, greenPull);
+          H = this.pull(H, C, 45, 25, 54, orangePull);
+
+          // Saturation reduction
+          const gm = Math.exp(-0.5 * Math.pow(this.hd(H, 150) / 30, 2));
+          const om = Math.exp(-0.5 * Math.pow(this.hd(H, 54) / 22, 2)) * Math.min(1, C / 0.03);
+          C = C * (0.74 - 0.22 * Math.abs(L_curve - 0.55) / 0.45 + 0.12 * gm + 0.20 * om);
+
+          // Shadow tinting (Slate)
+          L_curve = L_curve - (0.55 - 0.25 * om) * C * Math.min(1, L_curve / 0.3);
+
+          // Warm highlights and tinted shadows (adjusted by warmth)
+          const ws = Math.pow(Math.min(1, Math.max(0, 1 - L_curve / 0.45)), 1.4);
+          const wh = Math.pow(Math.min(1, Math.max(0, (L_curve - 0.65) / 0.35)), 1.2);
+
+          // Base warmth: shadow and highlight tints
+          let warmthShadowFactor = 0.022;
+          let warmthHighlightFactor = 0.034 * this.warmth;  // Warmth multiplies highlight warmth
+
+          // Add overall warmth undertone (shift toward warm when warmth > 1)
+          const warmthUndertone = (this.warmth - 1.0) * 0.008;
+
+          const a = C * Math.cos(H * Math.PI / 180) + warmthShadowFactor * Math.cos(250 * Math.PI / 180) * ws + warmthHighlightFactor * Math.cos(74 * Math.PI / 180) * wh + warmthUndertone;
+          const b_ = C * Math.sin(H * Math.PI / 180) + warmthShadowFactor * Math.sin(250 * Math.PI / 180) * ws + warmthHighlightFactor * Math.sin(74 * Math.PI / 180) * wh;
+
+          // Add grain
+          L_curve += this.grain(L_curve);
+
+          // OKLab back to RGB
+          const [r_out, g_out, b_out] = OKLab.lch2rgb(Math.min(1, Math.max(0, L_curve)), Math.hypot(a, b_), (Math.atan2(b_, a) * 180 / Math.PI + 360) % 360);
+
+          data[i] = Math.round(r_out * 255);
+          data[i + 1] = Math.round(g_out * 255);
+          data[i + 2] = Math.round(b_out * 255);
+        }
+
+        return imageData;
+      }
+    }
+
+    let currentGrader = new FutureArchivesGrader(1.8, 1.6, 1.6);  // Finalized: warm, dramatic, colour-tense
+    let originalImage = null;
+    let originalImageData = null;
+    let originalCanvas = null;
+
+    function setupUpload() {
+      const uploader = document.getElementById('uploader');
+      const uploadArea = document.getElementById('uploadArea');
+      const fileInput = document.getElementById('fileInput');
+
+      uploadArea.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        uploader.classList.add('drag-over');
+      });
+
+      uploadArea.addEventListener('dragleave', () => {
+        uploader.classList.remove('drag-over');
+      });
+
+      uploadArea.addEventListener('drop', (e) => {
+        e.preventDefault();
+        uploader.classList.remove('drag-over');
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+          handleFile(files[0]);
+        }
+      });
+
+      fileInput.addEventListener('change', (e) => {
+        if (e.target.files.length > 0) {
+          handleFile(e.target.files[0]);
+        }
+      });
+    }
+
+    let sourceName = 'photo';
+    function handleFile(file) {
+      sourceName = (file.name || 'photo').replace(/\.[^.]+$/, '').replace(/[^\w-]+/g, '-').replace(/^-+|-+$/g, '').toLowerCase() || 'photo';
+      if (!file.type.startsWith('image/')) {
+        showStatus('Please select an image file', 'error');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          originalImage = img;
+          processImage();
+        };
+        img.onerror = () => {
+          showStatus('Error loading image. Try a different file.', 'error');
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function processImage() {
+      showStatus('Grading your photo...', 'info');
+
+      // Show preview section
+      document.getElementById('previewContainer').style.display = 'block';
+      document.getElementById('uploader').style.display = 'none';
+
+      // Display original
+      const originalPreview = document.getElementById('originalPreview');
+      originalPreview.src = originalImage.src;
+
+      // Grade the image
+      setTimeout(() => {
+        try {
+          const canvas = document.createElement('canvas');
+          const W0 = originalImage.naturalWidth || originalImage.width, H0 = originalImage.naturalHeight || originalImage.height;
+          const MAX_PX = 16000000; // largest canvas every current browser accepts (iOS Safari caps near 16.7 MP)
+          const k = Math.min(1, Math.sqrt(MAX_PX / (W0 * H0)));
+          canvas.width = Math.round(W0 * k);
+          canvas.height = Math.round(H0 * k);
+
+          const ctx = canvas.getContext('2d');
+          ctx.imageSmoothingQuality = 'high';
+          ctx.drawImage(originalImage, 0, 0, canvas.width, canvas.height);
+
+          const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+          // Step 1: Auto-balance
+          showStatus('Balancing exposure and color...', 'info');
+          const balancedData = currentGrader.autoBalance(imageData);
+
+          // Step 2: Apply grade
+          showStatus('Applying Varanashi grade...', 'info');
+          const gradedData = currentGrader.grade(balancedData);
+
+          ctx.putImageData(gradedData, 0, 0);
+
+          // Display graded
+          const gradedPreview = document.getElementById('gradedPreview');
+          gradedPreview.src = canvas.toDataURL('image/jpeg', 0.9);
+
+          // Save for download and re-grading
+          originalImageData = { canvas, data: gradedData };
+          originalCanvas = canvas;
+
+          showStatus('✓ Grading complete', 'success');
+          document.getElementById('processingStatus').style.display = 'none';
+        } catch (err) {
+          showStatus('Error grading image: ' + err.message, 'error');
+        }
+      }, 100);
+    }
+
+    // Inside the hub the page saves the file for us (frames cannot download on their own);
+    // opened on its own, it falls back to an ordinary browser download.
+    function downloadGraded() {
+      if (!originalImageData) return;
+      const btn = document.getElementById('downloadBtn');
+      const filename = sourceName + '-varanashi-graded.jpg';
+      btn.disabled = true;
+      originalImageData.canvas.toBlob(blob => {
+        btn.disabled = false;
+        if (!blob) { showStatus('Could not prepare the download. Try a smaller photo.', 'error'); return; }
+        if (window.parent !== window) {
+          window.parent.postMessage({ varanashiGraderSave: { filename, blob } }, '*');
+        } else {
+          const url = URL.createObjectURL(blob), link = document.createElement('a');
+          link.href = url; link.download = filename; document.body.appendChild(link); link.click(); link.remove();
+          setTimeout(() => URL.revokeObjectURL(url), 4000);
+        }
+      }, 'image/jpeg', 0.95);
+    }
+
+    function resetUpload() {
+      document.getElementById('previewContainer').style.display = 'none';
+      document.getElementById('uploader').style.display = 'block';
+      document.getElementById('fileInput').value = '';
+      originalImage = null;
+      originalImageData = null;
+      originalCanvas = null;
+    }
+
+    function showStatus(message, type) {
+      const status = document.getElementById('processingStatus');
+      if (status) {
+        status.textContent = message;
+        status.className = `status ${type} show`;
+        status.style.display = 'block';
+      }
+    }
+
+    function setupCompareSlider() {
+      const compare = document.getElementById('compare');
+      const handle = document.getElementById('compareHandle');
+      const after = document.getElementById('gradedPreview');
+      let dragging = false;
+
+      function setPosition(clientX) {
+        const rect = compare.getBoundingClientRect();
+        let pct = ((clientX - rect.left) / rect.width) * 100;
+        pct = Math.max(0, Math.min(100, pct));
+        after.style.clipPath = `inset(0 0 0 ${pct}%)`;
+        handle.style.left = pct + '%';
+      }
+
+      function start(e) {
+        dragging = true;
+        setPosition((e.touches ? e.touches[0] : e).clientX);
+      }
+      function move(e) {
+        if (!dragging) return;
+        setPosition((e.touches ? e.touches[0] : e).clientX);
+      }
+      function end() { dragging = false; }
+
+      compare.addEventListener('mousedown', start);
+      compare.addEventListener('touchstart', start, { passive: true });
+      window.addEventListener('mousemove', move);
+      window.addEventListener('touchmove', move, { passive: true });
+      window.addEventListener('mouseup', end);
+      window.addEventListener('touchend', end);
+
+      // start at 50%
+      requestAnimationFrame(() => {
+        after.style.clipPath = 'inset(0 0 0 50%)';
+        handle.style.left = '50%';
+      });
+    }
+
+    setupUpload();
+    setupCompareSlider();
+
+    // Report content height to the parent page so the embedding iframe can size to fit
+    // (compact while empty, taller once a photo is loaded) instead of reserving fixed space.
+    function reportHeight() {
+      const h = Math.ceil(document.body.getBoundingClientRect().height);
+      window.parent.postMessage({ varanashiGraderHeight: h }, "*");
+    }
+    if (window.ResizeObserver) {
+      new ResizeObserver(reportHeight).observe(document.body);
+    } else {
+      window.addEventListener("load", reportHeight);
+      setInterval(reportHeight, 500);
+    }
+    reportHeight();
+  </script>
+</body>
+</html>
