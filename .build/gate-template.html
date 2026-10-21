@@ -14,7 +14,7 @@
 
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500&family=Hind+Mysuru:wght@400;500;600&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500&family=Hind+Mysuru:wght@400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
         <style>
             :root{--slate:#2C3D52;--limewash:#F9E6D6;--sunbreak:#E47444;--sunbreak-deep:#AC492B;--cream:#FBF2E9;--warm-line:rgba(172,73,43,.22)}
             *{box-sizing:border-box}
@@ -51,6 +51,7 @@
             .staticrypt-decrypt-button{width:100%;font:inherit;font-size:15px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--cream);background:var(--sunbreak-deep);border:0;border-radius:999px;padding:15px 20px 13px;cursor:pointer;box-shadow:0 4px 10px -6px rgba(172,73,43,.24);transition:background .2s,transform .2s}
             .staticrypt-decrypt-button:hover{background:#9b4026;transform:translateY(-1px)}
             .staticrypt-decrypt-button:focus-visible{outline:3px solid rgba(228,116,68,.5);outline-offset:3px}
+            @media (max-height:640px){.staticrypt-content{padding-top:20px;padding-bottom:18px}.card{padding:26px 22px 22px}.lede{margin-bottom:18px}.brand{padding-top:18px}.lockup{width:180px!important}}
             @media (max-width:420px){.card{padding:34px 22px 26px;border-radius:20px}h1{font-size:26px}.lockup{width:220px}}
         </style>
     </head>
@@ -110,7 +111,8 @@
             const staticrypt = staticryptInitiator.init(staticryptConfig, templateConfig);
 
             // try to automatically decrypt on load if there is a saved password
-            window.onload = async function () {
+            /* run as soon as the page itself is parsed; do not wait for fonts or the background photo */
+            const staticryptStart = async function () {
                 const { isSuccessful } = await staticrypt.handleDecryptOnLoad();
 
                 // if we didn't decrypt anything on load, show the password prompt. Otherwise the content has already been
@@ -127,6 +129,7 @@
                     }
                 }
             };
+            if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", staticryptStart); else staticryptStart();
 
             // toggle password visibility
             const toggleIcon = document.querySelector(".staticrypt-toggle-password-visibility");

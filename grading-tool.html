@@ -6,7 +6,7 @@
 <title>Varanashi Photo Grader</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400&family=Hind+Mysuru:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400&family=Hind+Mysuru:wght@400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <style>
 :root{
   color-scheme:light;
@@ -27,6 +27,7 @@ button{font:inherit;color:inherit}
 .upload-label{display:block;font-size:17px;font-weight:500;margin-bottom:4px}
 .upload-hint{font-size:14px;color:var(--soft);margin:0 0 18px}
 input[type=file]{display:none}
+.uploader.loading{opacity:.6;pointer-events:none}
 .uploader .err{color:var(--sunbreak-deep);font-size:14px;margin:12px 0 0}
 
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:42px;padding:11px 20px 8px;border-radius:999px;border:1px solid transparent;font-size:13px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;white-space:nowrap;transition:background .2s,border-color .2s,color .2s}
@@ -42,6 +43,7 @@ html.modal-open,html.modal-open body{background:transparent;overflow:hidden}
 html.modal-open .inline{display:none}
 .modal{position:fixed;inset:0;z-index:10;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(30,40,54,.55);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
 .sheet{position:relative;width:min(1180px,100%);max-height:calc(100vh - 32px);max-height:calc(100dvh - 32px);overflow:auto;background:var(--limewash);border-radius:24px;box-shadow:0 12px 32px -16px rgba(58,28,12,.25);padding:22px clamp(18px,2.4vw,30px) 22px;display:grid;gap:18px;overscroll-behavior:contain}
+.sheet:focus{outline:none}
 .sheet-head{display:flex;align-items:center;gap:14px}
 .sheet-head h2{font-family:"Fraunces",Georgia,serif;font-weight:400;font-size:26px;line-height:1.1;margin:0}
 .sheet-head .fname{color:var(--soft);font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;flex:1}
@@ -50,21 +52,14 @@ html.modal-open .inline{display:none}
 .close:focus-visible{outline:3px solid rgba(228,116,68,.45);outline-offset:2px}
 .close svg{width:16px;height:16px}
 
-.view-toggle{display:inline-flex;padding:3px;border-radius:999px;background:var(--panel);border:1px solid var(--warm-line);flex:none}
-.view-toggle button{all:unset;cursor:pointer;font-size:13px;font-weight:500;padding:6px 14px 4px;border-radius:999px;color:var(--soft)}
-.view-toggle button[aria-pressed=true]{background:var(--limewash-l2);color:var(--slate);box-shadow:0 1px 3px rgba(44,61,82,.12)}
-.view-toggle button:focus-visible{outline:2px solid rgba(228,116,68,.6)}
 
-.views{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.views{display:grid;grid-template-columns:1fr;gap:14px}
 .views figure{margin:0;display:grid;gap:8px;min-width:0}
-.views .frame{position:relative;border-radius:14px;overflow:hidden;background:var(--panel);display:flex;align-items:center;justify-content:center;height:min(52vh,520px)}
+.views .frame{position:relative;border-radius:14px;overflow:hidden;background:var(--panel);display:flex;align-items:center;justify-content:center;height:min(58vh,620px);cursor:pointer;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;touch-action:pan-y}
+.views .frame.holding{cursor:grabbing}
 .views canvas{display:block;max-width:100%;max-height:100%;width:auto;height:auto}
 .views figcaption{font-size:12px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);display:flex;justify-content:space-between;gap:8px}
 .views figcaption .hint{font-weight:400;letter-spacing:0;text-transform:none;font-size:13px}
-.views.solo{grid-template-columns:1fr}
-.views.solo .orig{display:none}
-.views.solo .frame{height:min(64vh,680px);cursor:pointer}
-.views:not(.solo) .hint{display:none}
 .busy{position:absolute;right:12px;top:12px;width:18px;height:18px;border-radius:50%;border:2px solid rgba(251,242,233,.6);border-top-color:var(--sunbreak);animation:spin .8s linear infinite;opacity:0;transition:opacity .15s}
 .busy.on{opacity:1}
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -94,10 +89,9 @@ input[type=range]:focus-visible::-moz-range-thumb{box-shadow:0 0 0 4px rgba(228,
   .modal{padding:0}
   .sheet{border-radius:0;max-height:100vh;max-height:100dvh;height:100%;padding:16px 16px 20px;align-content:start}
   .sheet-head h2{font-size:22px}
-  .views{grid-template-columns:1fr 1fr;gap:8px}
   .views .frame{height:auto;border-radius:10px}
-  .views canvas{width:100%;height:auto;max-height:34vh;object-fit:contain}
-  .view-toggle{display:none}
+  .views canvas{width:100%;height:auto;max-height:46vh;object-fit:contain}
+  .views figcaption{flex-direction:column;gap:2px}
   .controls{grid-template-columns:1fr;gap:12px}
   .sheet-foot .acts{width:100%}
   .sheet-foot .acts .btn{flex:1}
@@ -117,20 +111,16 @@ input[type=range]:focus-visible::-moz-range-thumb{box-shadow:0 0 0 4px rgba(228,
 </div>
 
 <div class="modal" id="modal" hidden role="dialog" aria-modal="true" aria-labelledby="mTitle">
-  <div class="sheet">
+  <div class="sheet" tabindex="-1">
     <div class="sheet-head">
       <h2 id="mTitle">Grade your photo</h2>
       <span class="fname" id="fname"></span>
-      <div class="view-toggle" role="group" aria-label="View">
-        <button type="button" data-view="side" aria-pressed="true">Side by side</button>
-        <button type="button" data-view="solo" aria-pressed="false">Graded only</button>
-      </div>
       <button class="close" id="closeBtn" aria-label="Close the grading window"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M5 5l10 10M15 5 5 15"/></svg></button>
     </div>
 
     <div class="views" id="views">
-      <figure class="orig"><figcaption>Original</figcaption><div class="frame"><canvas id="cvOrig"></canvas></div></figure>
-      <figure class="graded"><figcaption><span>Graded</span><span class="hint">Press and hold to see the original</span></figcaption><div class="frame" id="gradedFrame"><canvas id="cvGraded"></canvas><span class="busy" id="busy"></span></div></figure>
+      <canvas id="cvOrig" hidden></canvas>
+      <figure class="graded"><figcaption><span id="viewLabel">Graded</span><span class="hint">Press and hold the photo to see the original</span></figcaption><div class="frame" id="gradedFrame"><canvas id="cvGraded"></canvas><span class="busy" id="busy"></span></div></figure>
     </div>
 
     <div class="controls" id="controls"></div>
@@ -289,10 +279,10 @@ function resetAll(){ CONTROLS.forEach(c => setVal(c.id, c.def, true)); schedule(
 
 /* ---------- rendering: a small draft while dragging, the full preview on release ---------- */
 function makeLevel(maxEdge){
-  const k = Math.min(1, maxEdge / Math.max(img.naturalWidth, img.naturalHeight));
-  const w = Math.max(1, Math.round(img.naturalWidth * k)), h = Math.max(1, Math.round(img.naturalHeight * k));
+  const k = Math.min(1, maxEdge / Math.max(img.w, img.h));
+  const w = Math.max(1, Math.round(img.w * k)), h = Math.max(1, Math.round(img.h * k));
   const cv = document.createElement("canvas"); cv.width = w; cv.height = h;
-  const cx = cv.getContext("2d"); cx.imageSmoothingQuality = "high"; cx.drawImage(img, 0, 0, w, h);
+  const cx = cv.getContext("2d"); cx.imageSmoothingQuality = "high"; cx.drawImage(img.src, 0, 0, w, h);
   const id = cx.getImageData(0, 0, w, h);
   return { w, h, cv, cx, raw: new Uint8ClampedArray(id.data), id };
 }
@@ -317,7 +307,7 @@ function run(){
 function openModal(){
   html.classList.add("modal-open"); $("#modal").hidden = false;
   if(embedded) window.parent.postMessage({ varanashiGraderModal: true }, "*");
-  setTimeout(() => $("#closeBtn").focus(), 0);
+  setTimeout(() => $(".sheet").focus(), 0);
 }
 function closeModal(){
   $("#modal").hidden = true; html.classList.remove("modal-open");
@@ -330,9 +320,14 @@ function handleFile(file){
   const err = $("#uploadErr"); err.hidden = true;
   if(!file || !/^image\/(jpeg|png)$/.test(file.type)){ err.textContent = "Please choose a JPEG or PNG photo."; err.hidden = false; reportHeight(); return; }
   sourceName = (file.name || "photo").replace(/\.[^.]+$/, "").replace(/[^\w-]+/g, "-").replace(/^-+|-+$/g, "").toLowerCase() || "photo";
-  const url = URL.createObjectURL(file), im = new Image();
-  im.onload = () => {
-    img = im;
+  const ticket = ++loadTicket;
+  const fail = msg => { if(ticket !== loadTicket) return; err.textContent = msg; err.hidden = false; $("#uploader").classList.remove("loading"); reportHeight(); };
+  $("#uploader").classList.add("loading");
+  const timeout = setTimeout(() => { fail("That photo is taking too long to open. Try a smaller JPEG."); loadTicket++; }, 20000);
+  decodePhoto(file).then(decoded => {
+    clearTimeout(timeout); if(ticket !== loadTicket) return;
+    $("#uploader").classList.remove("loading");
+    img = decoded;
     prev = makeLevel(PREVIEW_MAX); draft = makeLevel(DRAFT_MAX);
     levels = measureLevels(prev.raw);
     [prev, draft].forEach(lv => { lv.base = new Uint8ClampedArray(lv.raw); applyLevels(lv.base, levels); });
@@ -341,9 +336,20 @@ function handleFile(file){
     o.getContext("2d").putImageData(new ImageData(new Uint8ClampedArray(prev.raw), prev.w, prev.h), 0, 0);
     $("#fname").textContent = file.name || "";
     resetAll(); openModal();
-  };
-  im.onerror = () => { err.textContent = "That file could not be opened. Try a different photo."; err.hidden = false; reportHeight(); };
-  im.src = url;
+  }).catch(() => { clearTimeout(timeout); fail("That file could not be opened. Try a different photo."); });
+}
+/* Decode the photo straight from the file (respects phone camera orientation). The fallback keeps a
+   firm reference to the loading image so the browser cannot discard it before it finishes. */
+let loadTicket = 0, loadingImg = null;
+async function decodePhoto(file){
+  if(window.createImageBitmap){
+    try { const bm = await createImageBitmap(file, { imageOrientation: "from-image" }); return { src: bm, w: bm.width, h: bm.height }; } catch(e){}
+  }
+  const url = URL.createObjectURL(file), im = new Image(); loadingImg = im;
+  try {
+    await new Promise((res, rej) => { im.onload = res; im.onerror = rej; im.src = url; });
+    return { src: im, w: im.naturalWidth, h: im.naturalHeight };
+  } finally { loadingImg = null; }
 }
 
 /* ---------- full-size download, in slices so the page stays responsive ---------- */
@@ -351,10 +357,10 @@ async function download(){
   if(!img) return;
   const btn = $("#downloadBtn"), label = btn.textContent; btn.disabled = true;
   try {
-    const MAX_PX = 16000000, W0 = img.naturalWidth, H0 = img.naturalHeight, k = Math.min(1, Math.sqrt(MAX_PX / (W0 * H0)));
-    const w = Math.round(W0 * k), h = Math.round(H0 * k);
+    const MAX_PX = 16000000, W0 = img.w, H0 = img.h, k = Math.min(1, Math.sqrt(MAX_PX / (W0 * H0)));
+    const w = Math.floor(W0 * k), h = Math.floor(H0 * k);
     const cv = document.createElement("canvas"); cv.width = w; cv.height = h;
-    const cx = cv.getContext("2d"); cx.imageSmoothingQuality = "high"; cx.drawImage(img, 0, 0, w, h);
+    const cx = cv.getContext("2d"); cx.imageSmoothingQuality = "high"; cx.drawImage(img.src, 0, 0, w, h);
     const id = cx.getImageData(0, 0, w, h);
     applyLevels(id.data, levels);
     const snap = Object.assign({}, P), step = Math.max(16, Math.floor(400000 / w));
@@ -390,15 +396,17 @@ function wire(){
   $("#downloadBtn").addEventListener("click", download);
   $("#modal").addEventListener("click", e => { if(e.target.id === "modal") closeModal(); });
   document.addEventListener("keydown", e => { if(e.key === "Escape" && !$("#modal").hidden) closeModal(); });
-  document.querySelectorAll(".view-toggle button").forEach(b => b.addEventListener("click", () => {
-    document.querySelectorAll(".view-toggle button").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
-    $("#views").classList.toggle("solo", b.dataset.view === "solo");
-  }));
-  /* graded-only view: press and hold to see the original in place */
-  const gf = $("#gradedFrame");
-  const show = on => { if(!$("#views").classList.contains("solo") || !prev) return; const g = $("#cvGraded").getContext("2d"); g.drawImage(on ? $("#cvOrig") : prev.cv, 0, 0, $("#cvGraded").width, $("#cvGraded").height); };
-  gf.addEventListener("pointerdown", () => show(true));
-  ["pointerup","pointerleave","pointercancel"].forEach(t => gf.addEventListener(t, () => { if($("#views").classList.contains("solo")) show(false); }));
+  /* press and hold the photo (or hold the space bar on it) to see the original in place */
+  const gf = $("#gradedFrame"); let holding = false;
+  gf.tabIndex = 0; gf.setAttribute("aria-label", "Graded photo. Press and hold to see the original.");
+  const show = on => { if(!prev || on === holding) return; holding = on; gf.classList.toggle("holding", on);
+    const g = $("#cvGraded"); g.getContext("2d").drawImage(on ? $("#cvOrig") : prev.cv, 0, 0, g.width, g.height);
+    $("#viewLabel").textContent = on ? "Original" : "Graded"; };
+  gf.addEventListener("pointerdown", e => { e.preventDefault(); show(true); });
+  ["pointerup","pointerleave","pointercancel"].forEach(t => gf.addEventListener(t, () => show(false)));
+  gf.addEventListener("contextmenu", e => e.preventDefault());
+  gf.addEventListener("keydown", e => { if(e.key === " "){ e.preventDefault(); show(true); } });
+  gf.addEventListener("keyup", e => { if(e.key === " ") show(false); });
 }
 
 /* the hub sizes this frame to fit while it is inline */
