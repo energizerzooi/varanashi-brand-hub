@@ -3,7 +3,7 @@ name: "asset-studio"
 description: "Studio-grade posters, social posts, carousels, flyers, banners, menus, invites, signage and print pieces. Brief first, Figma-board north star, go wide on a contact sheet, then refine the pick with textured motifs and lint."
 ---
 
-# Asset Studio (v3, 5 Nov 2026)
+# Asset Studio (v5, 24 Nov 2026)
 
 Work like a top digital creative studio: brief → north star → go wide → pick → refine → proof. The bundled brand pack supplies the anchors (colours, fonts, logo, facts). **This skill is self-contained and wins:** where it disagrees with any other brand skill, including `varanashi-farms` and the Hub's brand skill, follow this one. This skill supplies the taste, the system and the checks.
 
@@ -32,11 +32,11 @@ Never polish before the pick, and never make anything permanent (commit, publish
    - originals must reach about 3600 px across a large print; flag low-resolution sources
 4. **Lists become shapes.** No numbered lists (01 / 02 / 03), no bullet columns. Three or four points sit in cut-paper shapes of different anchor tints, with short lines and hand-set breaks.
 5. **No sticker ovals or badge clutter.** No call-to-action lines unless the brief asks for one.
-6. **Approved lockup files only**, recoloured to one solid colour, placed on a calm, dark or light area that passes 3:1. Never rebuild a lockup from type.
-7. **Italics sparingly:** Latin names, and at most one accent word. Body and timing lines are roman.
+6. **Approved lockup files only.** The lockups in `brand-packs/varanashi/assets/lockups/` are outlined artwork (ST Nazm 800, ss01, bespoke kerning, baked 24 Nov 2026). Place one on a calm, dark or light area that passes 3:1, in one solid colour. **Never rebuild a lockup from live type**, and never re-kern or re-weight it. Pick the fill variant by how you are embedding it: the default and `-paper` files carry explicit fills and are safe anywhere; `-current.svg` inherits `color` and **only works inlined** — via `<img>` it renders black. Below 36px mark height use `varanashi-mark.svg` alone.
+7. **Italics sparingly:** Sentient Italic is the only italic in the system. Latin names, and at most one accent word. Body and timing lines are roman.
 8. **Textures are felt, not seen:** 10–30% (paper tooth 12–20%, paint 10–25%, wood 30–35%, shape gouache 14–18%, grain 7–10%). At full size they read as surface, not pattern.
 9. **Proportion at scale:** large formats get generous, even rhythm (8 px multiples). Cards get padding ≥ 36 px and run to the margin. No element crowds an edge, and nothing is squeezed.
-10. **Product names** read best stencilled on a wood strip (VOM, crates, stalls); titles in ST Nazm 1000.
+10. **Product names** sit on a textured wood strip (VOM, crates, stalls) in **Quicksand 700 caps**. The stamped, rugged quality comes from the surface treatment, not from stencilled letterforms — Big Shoulders Stencil is retired. Titles in ST Nazm, ss01 off.
 11. **White balances the composition.** Shape-led slides sit on a generous cream ground (about 40–55% open) with a few big shapes, like the Matisse sun-over-wave card. Don't fill every corner.
 12. **Complementary blue and orange.** Hues can move brighter than the anchors, within the board's range (cobalt to dusty blue, sunbreak to apricot). In a composition, one leads and the other answers, and both always appear together.
 13. **Sets share elements.** In a carousel, deck or series, every page carries at least two shared things: a recurring motif fragment (a cut-paper sun or a wave), the colour pair, and a footer line in the same face and place.
@@ -59,14 +59,14 @@ Pick 1–2 per draft and name them in the genome. Re-read the board for today's 
 
 ## The loop
 1. **Brief: ask everything first** (§1), in one round, before any research or drawing. Then place the piece on the **output matrix** (§1.1).
-2. **North star:** read today's board note, or refresh it if it's the day's first piece (see Stance). Optionally add Pinterest and Cosmos (§2) to the steal sheet of moves.
-3. **Go wide** (§8): 6–9 rough drafts, each with a genome and a one-line idea, spanning quiet → loud. Rotate the colour key. Use rough copy and run only a fast lint (contrast, focal-clear).
+2. **Direction:** read `reference/reference.json` and `reference/MOVES.md` (§2). Pick the moves this piece will use. No live browsing unless the farm asks for it.
+3. **Go wide** (§8): **8–10 fast comps**, each with a matrix coordinate, a genome, one or two named moves and a one-line idea. Rough copy, placeholder photographs, fast lint only. The round must cover all four quadrants.
 4. **Contact sheet** with the one-line ideas. Send it. ⟶ **the person picks.**
 5. **Lock copy** (§9) for the pick with `copycheck.py`. Verified copy is never re-checked.
 6. **Refine** the pick in HTML on the grid (§3), with the motif kit (§5), textures (§6) and accents (§7).
 7. **Lint** with `lint.js` (§10). Fix every fail. A warning may stay only with a stated reason.
-8. **Critique** the render, the squint and the overlay against the rubric (§10). Fix the lowest score and repeat. Show the refined version.
-9. **Adapt and produce** (§11) after approval: twins for other formats (re-proportioned, never scaled), print PDF, handover. Nothing becomes permanent before this step.
+8. **Critique** the render, the squint and the overlay against the rubric (§10). Fix the lowest score and repeat. **Nothing is shown to the farm until `lint.js` passes.**
+9. **Produce** (§11) after approval, into the target named in the brief. Twins for other formats are re-proportioned, never scaled, and each is linted. Nothing becomes permanent before this step.
 
 ## 1. The brief (ask all of it, once)
 Use one AskUserQuestion call (up to 4 questions, with options and the recommended one first). If more is needed, ask a second round straight after. Never start research before the answers come back, unless the person is away. Then use the defaults and say so.
@@ -90,11 +90,54 @@ Two axes: **print ↔ digital** and **informative ↔ graphic**.
 - Graphic pieces: one big shape or word, rough edges, grain, a single wink.
 - A carousel alternates the two, opening and closing graphic.
 
-## 2. Research (Pinterest + Cosmos)
-- Use the browser. Cosmos: `cosmos.so/search/elements/<query>`. Scroll once to load the images, then screenshot. Pinterest: `pinterest.com/search/pins/?q=<query>`. It usually asks for sign-in: never sign in for the person. Ask them to sign in to the browser pane themselves, or read what shows behind the wall and carry on with Cosmos.
-- Run 6–8 queries across five lenses: **luxury** (`luxury <category> branding`), **playful** (`playful <category> poster`), **pattern and motif** (`<category> branding pattern`, plus a local craft, e.g. `indian block print textile`), **texture and print** (`risograph poster`, `seed packet design`), **type and annotation** (`editorial poster annotation scribble`).
-- Write a **steal sheet**: 8–12 named moves, each with its lens, e.g. "tone-on-tone monogram repeat (luxury)", "roundel with circular text (heritage)", "giant soft-serif number (playful)", "scalloped stamp frame (packet)", "hand-circled detail (annotation)". Take moves, never artwork: no one else's illustration, logo, mascot or layout copied whole.
-- Keep it short. The research exists to widen the move set, not to make a moodboard nobody asked for.
+### 1.2 Where the file is going (ask in the first round)
+
+| Target | What it means for the build |
+|---|---|
+| **Canva** | Build through the Canva connector. Every element is its own editable object: no flattened artwork, no baked-in text. Photographs upload as assets, type stays live, the lockup goes in as SVG. |
+| **PNG** | Rendered from HTML with Playwright at 2× the delivery size. |
+| **SVG** | Vector only: live `<text>`, named `<g>` per element, no rasterised filters. Imports into any editor with its layers intact. |
+| **Here in the chat** | A published artifact. Good for anything the farm will look at, share by link, or iterate on with me. |
+
+Ask it in the first round with everything else. If the farm has no preference, the default is **here in the chat** for a single piece and **PNG** for anything going straight to a platform.
+
+### 1.3 The assets gate (do not draw without these)
+
+Before any comp is drawn the studio must hold:
+
+- **The words.** Every line that will appear. Not a brief about the words — the words.
+- **The photographs**, if the piece uses any, from the farm's own library. Never stock, never a board image, never generated.
+- **Every fact checkable**: price, date, weight, place, contact. Anything unverified stays `[FACT NEEDED: …]` in the comp and blocks production.
+
+If something is missing, ask for it and stop. A contact sheet built on invented copy wastes a round, because the layout that wins is the one that fits the real words.
+
+### 1.4 Atomic modularity
+
+Build every piece out of parts, never as one composed image.
+
+- A diagram is shapes and live text, not a picture of a diagram.
+- A photograph is a photograph; the type sits over it as type.
+- A texture is a layer, not something baked into the artwork underneath.
+- Anything repeated — a card, a tile, a row — is one component used many times, so a change lands everywhere at once.
+
+This is what makes the Canva and SVG handovers worth anything: the farm can move a line of type without asking for a re-render.
+
+## 2. The reference library (read this, not the internet)
+
+The farm supplied three direction boards. They are distilled, once, into the pack. The studio reads the distillation on every job; it does not browse.
+
+| File | What it gives |
+|---|---|
+| `reference/reference.json` | the output matrix and its four quadrants, eight colour behaviours, five texture families |
+| `reference/MOVES.md` | the named move set: structure S1–S10, colour C1–C8, surface T1–T5, type Y1–Y5 |
+| `reference/boards/` | the three boards, to look at when a move needs seeing |
+| `reference/matrix/` | the four quadrant tiles, one per family |
+
+**The rule that governs all of it.** A move is a verb, not a picture. The boards are other people's published work. Name the move, then invent the picture. If a draft is recognisable as a specific board piece, throw it away. No third-party logo, colour or photograph from a board ever reaches an output.
+
+The three colours on the texture board (Dusty Blue `#9BB0C4`, Muted Olive Green `#ABB270`, Burnt Sienna `#A55426`) are studio reference for how colour behaves. They never enter a brand asset, `brand.json`, or the brand hub.
+
+Live Pinterest or Cosmos rounds happen only when the farm asks for one, and what they find is added to `MOVES.md` rather than used once and lost.
 
 ## 3. Grid, alignment and intentional misalignment
 - 12 columns (8 on A5 and smaller), margin ≈ 6.5% of the width, gutter 24, unit 8. Helpers `X(c)`, `XE(c)`, `SPAN(a,b)`. Every coordinate comes from them.
@@ -174,26 +217,56 @@ Every surface carries texture: fields, gradients, cards, tags and shapes. A flat
 - Annotations that frame a subject (a dashed box, an arrow) are allowed: don't mark them `data-avoid`.
 - A photo used purely as ambience (blurred, or behind punch-outs) is `texture_only=True` and has no focal.
 
+
+**Pills, chips, tags and buttons.** A label in a rounded box is centred on its glyphs, not on its line box. The optical centre of a line of type sits above the line box's centre, so a box with equal padding reads as if the text has sunk. Give the bottom 1–2px more than the top, never the reverse. Measure it on the INK, not the line box: a line box reserves descender space that most labels never use, so a box centred on the line box leaves the glyphs sitting high or low. Caps-only labels sit highest of all. `lint.js` measures this as `pill-centring` using canvas ink metrics, skips labels that genuinely carry a descender, and fails anything off by more than 1.5px.
+
 ## 7. Type: the cast
-The brand carries every piece (Fraunces). At most **one guest face per piece**. Body is always Hind Mysuru (English and Kannada).
+Two faces carry the brand: **ST Nazm** for display and **Quicksand** for text. Everything else is a guest. At most **one guest face per piece**, on top of that pair.
+
+**Three traps, all measured off the shipped files:**
+- **Always state the weight.** Sentient defaults to 700, ST Nazm to 250, Quicksand to 300. An element with no stated weight silently renders at those.
+- **CSS `font-weight` caps at 1000.** For ST Nazm above 1000 use `font-variation-settings:'wght' N`. A plain `font-weight:1200` is invalid and falls back without warning.
+- **Cap heights differ by up to 1.7×.** Size by cap height, not font-size. Zyntra Doodle needs ×1.643 to sit level with Quicksand. The table is in `brand.json` under `type.cap_height`.
+
 | Character | Face | Use |
 |---|---|---|
-| Brand, range | **Fraunces**: 100 hairline italic → 300 italic → 500 → 700 soft → 900 soft wonky | titles; pairs of extremes (900 roman + 100 italic) give energy |
-| Sophisticated | **ST Nazm** (variable 250–1200; above 1000 use `font-variation-settings:'wght'`) | warm heavy serif titles, labels, quotes |
-| Bold, wide | **Lucidity Expand** (Aiyari, paid licence). **Stand-in until licensed: Unbounded 800** | big numbers, one-word shouts |
-| Playful | **Shrikhand** | stickers, sale shouts |
-| Rugged | **Big Shoulders Stencil** | crate and sack stamps, VOM, compost, signage |
-| Child-like | **Gaegu** | schools, outreach, kids' camps |
-| Hand | **Caveat** | notes, arrows, optimism lines |
+| Logotype | **ST Nazm 800, ss01, outlined** | the lockup files only, never set live |
+| Display, titles | **ST Nazm** 400–1200, **ss01 off** | ss01 is reserved for the logotype, and is what keeps the mark distinct from a headline in the same face |
+| Quiet display | **Sentient** 300–500 | the softer title voice |
+| Italic | **Sentient Italic** | the only italic; Latin names, one accent word |
+| Text, English | **Quicksand** 500 | never below 500 in print: the rounded terminals fill in on absorbent stock |
+| Label | **Quicksand** 700 caps, tracking .08–.16em | |
+| Crates, signage, VOM | **Quicksand** 700 caps on a textured wood strip | the stamped quality is the surface, not the letterform |
+| Text, Kannada | **Noto Sans Kannada** 400–500 | |
+| Display, Kannada | **Noto Serif Kannada** 500–700 | |
+| Stamps, roundels, numbers | **Zyntra Doodle** caps, ×1.643 | also the kids and outreach lane |
+| Hand | **Caveat** 600–700 | notes, arrows, circling. *No file in the pack yet.* |
 | Detail | **Courier Prime** | field-note captions, dates, specimen data |
-| Logo | seedling + Fraunces wordmark (+ approved Kannada in Kedage) | |
-Retired for Varanashi: Instrument Serif, Bricolage Grotesque.
+| Personality, posters only | **Shrikhand**, **Unbounded**, **Gaegu** | where a poster wants more personality. Never on informative pieces, never as body |
+| Decorative titles | **Elite Accents**, **Lucidity Expand**, **Bookmania** | graphic column of the matrix only, one per piece |
+
+**Bilingual setting.** Kannada x-heights run larger than the Latin faces, so equal font-size looks unequal. Multiply the Latin size by **0.913** beside Quicksand, **0.921** beside Sentient, **0.905** beside ST Nazm. Kannada line-height is **≥ 1.62** — the measured minimum for Noto Serif Kannada to clear its descenders, not a rule of thumb. Allow 30% extra length for translations.
+
+**Glyph gaps.** Quicksand carries ₹ · ½ ¼. **Courier Prime has no ₹** — patch it with a scoped `@font-face` serving only U+20B9 from Sentient (`brand.json` → `type.glyph_fallback`). No face in the cast has → ↑ or ✓: draw those, don't type them. Never fix a glyph gap by changing the copy. Test coverage with a two-fallback probe, never by comparing a glyph's width to notdef — in a monospaced face like Courier Prime every glyph has the same advance and that test always lies.
+
+**Licensing.** `brand.json` → `type.licences` carries the status of every face. **Elite Accents and Zyntra Doodle are UNVERIFIED** — no licence text in either file — and must not go on public work until their EULAs are obtained. Lucidity Expand is unlicensed. Sentient requires crediting ITF in design or production credits.
+
 Scale: display ÷ body ≥ 3.5. Notes are lowercase, ≥ 40px, rotated, and true.
 
 ## 8. Directions: the genome
-(Add **F** family from the matrix: print-informative · print-graphic · digital-informative · digital-graphic.)
-Write each direction's genome: **S** structure (S0 type only · S1 vertical split · S2 horizontal split · S3 window/stamp · S4 tiles · S5 field + object) · **L** lead (L1 title · L2 number · L3 image · L4 badge) · **K** key (blue / orange / lichen) · **M** motif (buti · border · rays · rings · rain · none) · **A** accent (note · roundel · sticker · circle) · **V** voice (V1 quiet luxury · V2 confident · V3 loud play).
-A wide round: 6–9 rough drafts, pairwise different on at least 3 axes, spanning V1 to V3, with all three keys used across the round. After the pick, iterate one axis at a time. Name each by its idea ("Sun rising", "Seed packet").
+
+Every direction on a contact sheet carries four things:
+
+1. **A matrix coordinate** `(x, y)` in −1..+1. x −1 wholly print, +1 wholly digital; y +1 wholly informative, −1 wholly graphic.
+2. **A genome.** **S** structure (S0 type only · S1 vertical split · S2 horizontal split · S3 window/stamp · S4 tiles · S5 field + object) · **L** lead · **V** volume V1 quiet → V3 loud · **K** colour key.
+3. **One or two named moves** from `MOVES.md`, cited by code. No two directions in a round may cite the same pair.
+4. **A one-line idea**, in plain words, that a person can choose between without seeing the comp.
+
+**The round's contract:** 8–10 directions, at least two in each matrix quadrant and at least one within 0.25 of the origin. Pairwise different on at least three axes. All three colour keys used across the round. V1 to V3 represented.
+
+Comps are **fast**: real layout and real proportions, flat fills instead of finished textures, grey boxes where photographs will go, rough copy. They exist to choose between, not to admire. Only the pick gets built properly.
+
+After the pick, iterate one axis at a time so the farm can see what each change did.
 
 ## 9. Copy
 - Titles: short, active, no full stop, no eyebrow above them, no "this, not that" construction. A title says one true thing.
@@ -201,9 +274,11 @@ A wide round: 6–9 rough drafts, pairwise different on at least 3 axes, spannin
 - Hand notes are copy too: they must be true and checkable ("that's us, in the middle" only where the house really is in the middle).
 - CTAs say the real mechanism ("Message us to buy"). Never invent a URL, price or date. Leave `[FACT NEEDED: …]` instead.
 - `copycheck.py copy.json --pack brand.json --ledger facts.json --clear` checks banned words, spellings, AI labels, full stops in titles and "not X" constructions, and every claim against the ledger. Verified, cleared copy is skipped next time. Unknown claims are batched into one question.
-- Languages: never machine-write a script for publication you cannot verify (for example, Kannada for Varanashi). Leave `[KANNADA: approved line needed]`. Allow 30% extra length for translations; Kannada body gets line-height ≥ 1.6.
+- Languages: never machine-write a script for publication you cannot verify. Leave `[KANNADA: approved line needed]` and ask. The one approved Kannada string so far is the lockup's: **ವಾರಣಾಶಿ ಸಾವಯವ ತೋಟ**. Allow 30% extra length for translations; Kannada body gets line-height ≥ 1.62 (measured, see §7).
 
-## 10. Proof
+## 10. Proof — a gate, not a report
+`lint.js` runs before anything reaches the farm. Every **fail** is fixed, not reported. A **warn** may stand only with a stated reason. A comp round runs the fast subset; the pick runs all of it.
+
 `node scripts/lint.js page.html --pack brand.json --out out --overlay` checks:
 - fonts loaded
 - contrast on the pixels
@@ -227,18 +302,43 @@ A wide round: 6–9 rough drafts, pairwise different on at least 3 axes, spannin
 9. Distinctness within the round
 
 ## 11. Formats and production
+
+### Sizes
 - **Digital:** post 1080×1350 (bottom 120 clear), story 1080×1920 (top 230 and bottom 330 clear), square 1080, carousel. Lockup on the first and last slides.
-- **Print:** design at the A-size ratio in px (A3 preview 1240×1754, A5 874×1240). Export a PDF with Playwright: `page.pdf({width:'297mm',height:'420mm',printBackground:true,scale:297/(1240*25.4/96)})`.
-  - For press, extend fields 3mm past the trim and keep type 5mm inside it.
-  - Body ≥ 9pt equivalent.
-  - SVG filters rasterise, so large PDFs are expected.
-  - Colours are screen values until a proof.
-  - On kraft or riso, limit the piece to 2–3 inks.
-- **Twins:** re-proportion the same genome for each format. Don't scale or crop it. Run lint on every twin.
-- **Handover:** PNGs, HTML source, PDF for print, lint JSON, and a one-line note on any open facts or approvals.
+- **Print:** design at the A-size ratio in px (A3 preview 1240×1754, A5 874×1240). Export PDF with Playwright: `page.pdf({width:'297mm',height:'420mm',printBackground:true})`. Extend fields 3mm past the trim, keep type 5mm inside it, body ≥ 9pt equivalent. On kraft or riso, 2–3 inks.
+- **Twins:** re-proportion the genome per format. Never scale or crop. Lint every twin.
+
+### Targets
+
+**Canva.** Build through the connector. The farm must be able to edit everything afterwards, so:
+- text goes in as text, never as an image of text;
+- the lockup goes in as SVG from `assets/lockups/`, never a PNG;
+- photographs upload as assets and are placed, not flattened into a background;
+- each repeated element is its own object, so one change does not mean a re-render.
+Check the brand kit first (`list-brand-kits`) and use it where it matches the pack.
+
+**PNG.** Playwright at 2× delivery size, `deviceScaleFactor: 2`. Check the render, not the HTML.
+
+**SVG.** Live `<text>`, one named `<g>` per element, no rasterising filters, fonts either embedded or outlined — state which. Imports into any editor with layers intact.
+
+**Here in the chat.** A published artifact. Self-contained HTML, fonts embedded, no external requests.
+
+Figma has no connector in this session. If the farm asks for Figma, hand over the SVG, which imports with its layers, and say so.
+
+### Handover
+PNG or the live file, the HTML source, a PDF for print, the lint JSON, and one line on any open facts or approvals.
 
 ## Appendix · Files
-Everything this skill needs ships in this folder. Paths are relative to the skill folder; run scripts from there.
-- `scripts/`: `lint.js`, `copycheck.py`, `focal.py`, `make_textures.py` (writes `assets/textures/`)
-- `brand-packs/varanashi/`: `brand.json`, `facts.json`, `motifs.py`, `motifs_v2.py`, `motifs_v3.py`, `assets/`
-Where this file says `--pack brand.json` or `--ledger facts.json`, use the files in `brand-packs/varanashi/`.
+
+| Path | What it is |
+|---|---|
+| `brand.json` | colours, type roster, logo construction, rules |
+| `reference/reference.json` | output matrix, colour behaviours, texture families |
+| `reference/MOVES.md` | the named move set |
+| `reference/boards/` | the three direction boards |
+| `reference/matrix/` | the four quadrant tiles |
+| `assets/lockups/` | the eight lockups, three colour variants each |
+| `assets/*.ttf`, `*.otf` | the type roster, self-hosted |
+| `motifs.py` | the motif and pattern kit |
+| `scripts/lint.js` | the design check |
+| `copycheck.py` | copy and fact checking |
