@@ -3,7 +3,7 @@ name: "asset-studio"
 description: "Studio-grade posters, social posts, carousels, flyers, banners, menus, invites, signage and print pieces. Brief first, Figma-board north star, go wide on a contact sheet, then refine the pick with textured motifs and lint."
 ---
 
-# Asset Studio (v5, 24 Nov 2026)
+# Asset Studio (v6, 25 Nov 2026)
 
 Work like a top digital creative studio: brief → north star → go wide → pick → refine → proof. The bundled brand pack supplies the anchors (colours, fonts, logo, facts). **This skill is self-contained and wins:** where it disagrees with any other brand skill, including `varanashi-farms` and the Hub's brand skill, follow this one. This skill supplies the taste, the system and the checks.
 
@@ -106,9 +106,15 @@ skipping it cost a round.
    correct: covering a quadrant nobody wants wastes two comps.
 5. **Go wide** (§8): 8–10 fast comps. **Execute the moves, do not cite them.** A label
    saying C3 overprint on a comp with no overprint is a failed comp. Each must differ in
-   structure, not only in background colour.
+   structure, not only in background colour. **For a carousel, deck or any multi-page
+   piece, comp each direction as two slides — an opener and an interior — on one sheet.**
+   A single tile cannot show caption rhythm or whether a direction survives past slide
+   one, and that is most of what a multi-page direction has to prove.
 6. **Critique your own sheet before sending it.** Render it and look. Broken comps make
-   the person choose badly. Fix what is broken; name what is weak.
+   the person choose badly. Fix what is broken; name what is weak. Check **content**, not
+   only craft: does each slide show what its own headline says it shows? A slide titled
+   "The spring" carrying the paddy photograph is a failure the linter cannot see, and it
+   survives any number of pixel checks.
 7. **Send the sheet, and say which are weak and why.** The person picks. If nothing
    lands, go wider — and that is the moment to ask whether to browse Pinterest or
    Cosmos for a fresh round.
@@ -128,6 +134,13 @@ skipping it cost a round.
   the same text measured on the rendered page was 4.04:1, because a grain layer had
   darkened the ground underneath. `lint.js` reads rendered pixels. Trust it over your
   own arithmetic.
+- *One photograph is not a photo plan.* The first carousel sheet had ten structurally
+  different directions and used **the same photograph in all ten**. The sheet read as one
+  idea restated, and the fault was invisible from inside the layout code — every comp was
+  individually fine. Before rendering a sheet, assign photographs across directions
+  deliberately and check the assignment, the same way you check the matrix spread. This is
+  *coverage is not range* wearing different clothes, which is why it got past a rule
+  written to catch exactly it.
 
 ## 1. The brief (ask all of it, once)
 Use one AskUserQuestion call (up to 4 questions, with options and the recommended one first). If more is needed, ask a second round straight after. Never start research before the answers come back, unless the person is away. Then use the defaults and say so.
@@ -155,19 +168,40 @@ Two axes: **print ↔ digital** and **informative ↔ graphic**.
 
 | Target | What it means for the build |
 |---|---|
-| **Canva** | Build through the Canva connector. Every element is its own editable object: no flattened artwork, no baked-in text. Photographs upload as assets, type stays live, the lockup goes in as SVG. |
+| **Canva** | Build through the Canva connector. Every element is its own editable object: no flattened artwork, no baked-in text. Photographs upload as assets, type stays live, the lockup goes in as SVG. **Check this target is reachable before promising it** — see the precondition below. |
 | **PNG** | Rendered from HTML with Playwright at 2× the delivery size. |
 | **SVG** | Vector only: live `<text>`, named `<g>` per element, no rasterised filters. Imports into any editor with its layers intact. |
 | **Here in the chat** | A published artifact. Good for anything the farm will look at, share by link, or iterate on with me. |
 
 Ask it in the first round with everything else. If the farm has no preference, the default is **here in the chat** for a single piece and **PNG** for anything going straight to a platform.
 
+**The Canva precondition.** Uploading to Canva is two steps: the connector returns a
+one-time upload URL, then the file's bytes are POSTed to it over ordinary HTTPS. The
+second step does not go through the connector, so it is subject to the session's network
+allowlist, and in a session where `www.canva.com` is not allowed it fails with a proxy
+`403 connect_rejected`. Every outbound route from the shell uses the same allowlist, so
+there is no way around it from inside the session — do not go looking for one, and do not
+report partial success because step one worked.
+
+Two things follow. **Verify before promising**: if Canva is the chosen target, say plainly
+that the design work happens here either way and the handover is settled at step 9, rather
+than implying the whole job runs in Canva. And **know what the connector alone can do**:
+`create-design` generates Canva's own layout from a written brief against a brand kit. It
+produces live editable text, which is the real reason to want Canva — but it will not
+reproduce a hand-placed composition. Grid grounds, rotated frames, organic blob masks and
+exact type pairings do not survive it. Offer that trade honestly instead of discovering it
+after the build. When the allowlist blocks the upload, the fallbacks in order are: ask for
+`www.canva.com` under Settings → Capabilities (a new chat picks the change up; the current
+one may not), hand over the rendered files for the person to drag in themselves, or use
+`create-design` with their explicit agreement to the trade.
+
 ### 1.3 The assets gate (do not draw without these)
 
 Before any comp is drawn the studio must hold:
 
 - **The words.** Every line that will appear. Not a brief about the words — the words.
-- **The photographs**, if the piece uses any, from the farm's own library. Never stock, never a board image, never generated.
+- **The photographs**, if the piece uses any, from the farm's own library. Never stock, never a board image, never generated. **Measure them before planning around them** — `assets/photos/README.md` lists every file's pixels and what it can carry. A photograph that arrived through WhatsApp has been recompressed; full-bleed at 1080 needs the short edge at 1080 or better, a collaged fragment needs about a third of that, a large print about 3600px across. Say what is too small and ask for the original, rather than upscaling quietly.
+- **Consent, where people are identifiable.** Several of the farm's photographs show visitors, and one shows about twenty children. The decision belongs to the farm — raise it once, plainly, whenever such a photograph is headed somewhere public, and then let them decide.
 - **Every fact checkable**: price, date, weight, place, contact. Anything unverified stays `[FACT NEEDED: …]` in the comp and blocks production.
 
 If something is missing, ask for it and stop. A contact sheet built on invented copy wastes a round, because the layout that wins is the one that fits the real words.
@@ -282,6 +316,12 @@ Every surface carries texture: fields, gradients, cards, tags and shapes. A flat
 **Pills, chips, tags and buttons.** A label in a rounded box is centred on its glyphs, not on its line box. The optical centre of a line of type sits above the line box's centre, so a box with equal padding reads as if the text has sunk. Give the bottom 1–2px more than the top, never the reverse. Measure it on the INK, not the line box: a line box reserves descender space that most labels never use, so a box centred on the line box leaves the glyphs sitting high or low. Caps-only labels sit highest of all. `lint.js` measures this as `pill-centring` using canvas ink metrics, skips labels that genuinely carry a descender, and fails anything off by more than 1.5px.
 
 ## 7. Type: the cast
+
+**Before setting any face, check `brand.json` → `type.availability`.** Four of the
+eighteen names in the roster have no file in this pack — Lucidity Expand (unlicensed),
+Caveat, Bookmania and VOF Kannada. Each has a recorded fallback. Setting a face that
+isn't there fails silently: the browser substitutes something, the render looks
+plausible, and nobody notices until print.
 Two faces carry the brand: **ST Nazm** for display and **Quicksand** for text. Everything else is a guest. At most **one guest face per piece**, on top of that pair.
 
 **Three traps, all measured off the shipped files:**
@@ -388,6 +428,10 @@ Figma has no connector in this session. If the farm asks for Figma, hand over th
 
 ### Handover
 PNG or the live file, the HTML source, a PDF for print, the lint JSON, and one line on any open facts or approvals.
+
+If the target was Canva and the upload was blocked, say exactly what failed and give the
+rendered files anyway. A blocked handover is not a failed job — but a job reported as
+delivered when the files never arrived is.
 
 ## Appendix · Files
 
