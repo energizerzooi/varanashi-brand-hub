@@ -9,6 +9,36 @@ Work like a top digital creative studio: brief → north star → go wide → pi
 
 **The bar:** every piece has energy (contrast of scale, value, temperature and style), refinement (tone-on-tone surfaces, perfect alignment where alignment matters) and optimism (light, warmth, upward movement, a wink). It should look made by a person with an opinion, not assembled.
 
+## Start here (if you are not in the farm's Claude project)
+
+This folder is self-contained. Attach the whole thing — or point your assistant at it —
+and everything needed to make a Varanashi asset is inside, with no external downloads.
+
+| Read | Before |
+|---|---|
+| this file | anything |
+| `brand-packs/varanashi/brand.json` | choosing a colour, a face or a lockup |
+| `brand-packs/varanashi/reference/MOVES.md` | choosing a direction |
+| `brand-packs/varanashi/reference/reference.json` | placing a piece on the output matrix |
+| `brand-packs/varanashi/example/` | your first job — a complete worked run |
+
+Fonts are in `brand-packs/varanashi/assets/` and are self-hosted: declare them with
+`@font-face` and never reach for a CDN. Lockups are in `assets/lockups/`, the farm's
+photographs in `assets/photos/`, textures in `assets/textures/`.
+
+Three rules that are not negotiable:
+
+1. **The farm's own photographs only.** No stock, nothing generated, nothing from a
+   reference board.
+2. **The reference boards are vocabulary, never artwork.** Name a move, then invent the
+   picture. If a draft is recognisable as a specific board piece, throw it away.
+3. **Never invent a fact.** A price, a date, a phone number you were not given stays
+   `[FACT NEEDED: …]`, and that blocks production.
+
+Run `node scripts/lint.js <page.html> --pack brand-packs/varanashi/brand.json --out out`
+before showing anyone anything. It needs Node and Playwright, and the page needs an
+element with `id="canvas"`.
+
 ## Stance: a toolkit, not a rulebook
 This skill **empowers, it does not limit.** Everything below is a thematic toolkit (moves, motifs, surfaces, type, checks) to reach for. If a brief wants something the kit doesn't have, make it. Only this skill's hard rules and the bundled pack's logo, facts and never-list are fixed.
 
@@ -58,15 +88,46 @@ Pick 1–2 per draft and name them in the genome. Re-read the board for today's 
 | Ticking stripe, wavy rug, dappled light, grainy gradient | surfaces | grounds behind cards, never behind text |
 
 ## The loop
-1. **Brief: ask everything first** (§1), in one round, before any research or drawing. Then place the piece on the **output matrix** (§1.1).
-2. **Direction:** read `reference/reference.json` and `reference/MOVES.md` (§2). Pick the moves this piece will use. No live browsing unless the farm asks for it.
-3. **Go wide** (§8): **8–10 fast comps**, each with a matrix coordinate, a genome, one or two named moves and a one-line idea. Rough copy, placeholder photographs, fast lint only. The round must cover all four quadrants.
-4. **Contact sheet** with the one-line ideas. Send it. ⟶ **the person picks.**
-5. **Lock copy** (§9) for the pick with `copycheck.py`. Verified copy is never re-checked.
-6. **Refine** the pick in HTML on the grid (§3), with the motif kit (§5), textures (§6) and accents (§7).
-7. **Lint** with `lint.js` (§10). Fix every fail. A warning may stay only with a stated reason.
-8. **Critique** the render, the squint and the overlay against the rubric (§10). Fix the lowest score and repeat. **Nothing is shown to the farm until `lint.js` passes.**
-9. **Produce** (§11) after approval, into the target named in the brief. Twins for other formats are re-proportioned, never scaled, and each is linted. Nothing becomes permanent before this step.
+
+Proven end to end on the swim-workshop poster, 25 Nov 2026. Each step exists because
+skipping it cost a round.
+
+1. **Brief.** The person says what they want.
+2. **Refine the brief, in one round** (§1). Platform, size, aspect, language, where the
+   finished file goes (§1.2), and any reference they already have. Ask everything at
+   once; a second short round is fine, a third is not.
+3. **The assets gate** (§1.3). No drawing until the real words, the farm's own
+   photographs and every checkable fact are in hand. Unverified facts become
+   `[FACT NEEDED: …]` and block **production**, not just design. Say what is blocking
+   and keep saying it.
+4. **Direction** (§2). Read `reference/reference.json` and `reference/MOVES.md`. Choose
+   the moves. Ask the person for a direction if they have not given one — loud or quiet,
+   photo-led or type-led. A stated direction narrows the matrix spread and that is
+   correct: covering a quadrant nobody wants wastes two comps.
+5. **Go wide** (§8): 8–10 fast comps. **Execute the moves, do not cite them.** A label
+   saying C3 overprint on a comp with no overprint is a failed comp. Each must differ in
+   structure, not only in background colour.
+6. **Critique your own sheet before sending it.** Render it and look. Broken comps make
+   the person choose badly. Fix what is broken; name what is weak.
+7. **Send the sheet, and say which are weak and why.** The person picks. If nothing
+   lands, go wider — and that is the moment to ask whether to browse Pinterest or
+   Cosmos for a fresh round.
+8. **Agree the refinements before making them.** Ask what specifically they want built
+   better. "Texture, type focus and hierarchy, colour" is a usable answer; "make it
+   nicer" is not. Then refine, iterating one axis at a time.
+9. **Lint as the gate, then produce** (§10, §11). Every fail fixed, every warning either
+   fixed or justified out loud. Only then does the file go to the target chosen at
+   step 2.
+
+**The two lessons that cost a round each.**
+
+- *Coverage is not range.* The first sheet hit every matrix quadrant and every comp was
+  the same layout recoloured. Spread across coordinates is necessary and nowhere near
+  sufficient. Test each pair of comps: do they differ in **structure**, not just hue?
+- *Measure pixels, not intentions.* Contrast computed on flat swatches passed at 5.9:1;
+  the same text measured on the rendered page was 4.04:1, because a grain layer had
+  darkened the ground underneath. `lint.js` reads rendered pixels. Trust it over your
+  own arithmetic.
 
 ## 1. The brief (ask all of it, once)
 Use one AskUserQuestion call (up to 4 questions, with options and the recommended one first). If more is needed, ask a second round straight after. Never start research before the answers come back, unless the person is away. Then use the defaults and say so.
