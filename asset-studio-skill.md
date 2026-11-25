@@ -134,6 +134,15 @@ skipping it cost a round.
   the same text measured on the rendered page was 4.04:1, because a grain layer had
   darkened the ground underneath. `lint.js` reads rendered pixels. Trust it over your
   own arithmetic.
+- *A measurement of the wrong render is worse than none.* Measuring the brand hub's
+  header, a throwaway Playwright script reported that every ST Nazm weight from 400 to 900
+  produced an identical stem. The font had silently failed to load and the script was
+  measuring Georgia. Acting on it would have set the wordmark two steps too heavy and
+  pushed the alignment further out than the fault being fixed. `lint.js` already fails a
+  comp whose declared faces are not loaded — the gap was an ad-hoc script that skipped
+  that check. **Any throwaway render harness asserts `document.fonts.check` for every face
+  it measures, and aborts rather than reporting.** A number carries authority that a guess
+  does not, which is exactly why a wrong one costs more.
 - *One photograph is not a photo plan.* The first carousel sheet had ten structurally
   different directions and used **the same photograph in all ten**. The sheet read as one
   idea restated, and the fault was invisible from inside the layout code — every comp was
